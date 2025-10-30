@@ -14,7 +14,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.compose import make_column_transformer, ColumnTransformer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import matthews_corrcoef,accuracy_score,make_scorer,balanced_accuracy_score,classification_report,roc_auc_score,confusion_matrix,plot_roc_curve,f1_score,precision_score,recall_score
+from sklearn.metrics import matthews_corrcoef,accuracy_score,make_scorer,balanced_accuracy_score,classification_report,roc_auc_score,confusion_matrix,RocCurveDisplay,f1_score,precision_score,recall_score
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB,BernoulliNB
@@ -388,7 +388,7 @@ def modelling(model,  X_train, X_test, y_train, y_test, eval_strat):
         else:'''
         fig, ax = plt.subplots(1,2, figsize=(15,5), gridspec_kw={'width_ratios': [1.5, 1]})
      
-        plot_roc_curve(model, X_test, y_test, ax=ax[0])
+        RocCurveDisplay(model, X_test, y_test, ax=ax[0])
         ax[0].plot([0,1], [0,1], linestyle='--', lw=2, label='Chance', alpha=.8)
         
         sns.heatmap(confusion_matrix(y_test, y_pred, labels=[1, 0]), annot=True, fmt='g', ax=ax[1], cmap='Blues',xticklabels=['admitted','non-admitted'],yticklabels=['admitted','non-admitted'])
@@ -727,7 +727,7 @@ def modelling_base_vs_best(model,  X_train, X_test, y_train, y_test):
         fig, ax = plt.subplots(1,4, figsize=(27,5))
         fig.suptitle('MODEL WITH ALL 74 AVAILABLE FEATURES ON BLIND DATASET             MODEL WITH BEST COMBINATION OF 10 FEATURES ON BLIND DATASET', y=1.09, x=0.55, fontsize=21,  fontweight='bold')
     #base model
-    plot_roc_curve(model, X_test, y_test, ax=ax[0])
+    RocCurveDisplay(model, X_test, y_test, ax=ax[0])
     ax[0].plot([0,1], [0,1], linestyle='--', lw=2, label='Chance', alpha=.8)
     sns.heatmap(confusion_matrix(y_test, y_pred, labels=[1, 0]), annot=True, fmt='g', ax=ax[1], cmap='Blues',xticklabels=['admitted','non-admitted'],yticklabels=['admitted','non-admitted'])   
     ax[1].set_ylabel('Actual')
@@ -754,7 +754,7 @@ def modelling_base_vs_best(model,  X_train, X_test, y_train, y_test):
     create_table_with_metrics_n_column([[cv_roc_auc_mean,roc_auc,cv_roc_auc_mean_best,roc_auc_best],[cv_accuracy_mean,accuracy,cv_accuracy_mean_best,accuracy_best],[cv_precision_mean,precision,cv_precision_mean_best,precision_best], [cv_recall_mean,recall,cv_recall_mean_best,recall_best]],model.__class__.__name__,4)
     #[cv_mcc_mean,mcc,cv_mcc_mean_best,mcc_best],[cv_f1_mean,f1,cv_f1_mean_best,f1_best],
     #plotting AUC
-    plot_roc_curve(model, X_test_best, y_test, ax=ax[2])
+    RocCurveDisplay(model, X_test_best, y_test, ax=ax[2])
     ax[2].plot([0,1], [0,1], linestyle='--', lw=2, label='Chance', alpha=.8)
     #Heatmap for CV
     sns.heatmap(confusion_matrix(y_test, y_pred_best, labels=[1, 0]), annot=True, fmt='g', ax=ax[3], cmap='Oranges',xticklabels=['admitted','non-admitted'],yticklabels=['admitted','non-admitted'])  
