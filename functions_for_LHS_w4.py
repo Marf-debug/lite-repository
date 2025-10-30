@@ -324,7 +324,7 @@ def cohort_2_transform_df(X_train, X_test, scaler = True):
     names_cats = pipe_cats_actual['ohe'].get_feature_names_out()
     #print('Number of categorical names: %d ' %  len(names_cats))
     # numerical values
-    names = [name for name, value in num_vars.iteritems() if value]
+    names = [name for name, value in num_varsitems() if value]
     names_num = names
     #print('Number of numerical names: %d ' %  len(names_num))
     # lasst of all new names
