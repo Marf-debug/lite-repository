@@ -291,7 +291,7 @@ def cohort_2_transform_df(X_train, X_test, scaler = True):
     values_num = X_train.dtypes != object
     values_cat = X_train.dtypes == object
 
-    si_0 = SimpleImputer(missing_values=np.NaN,strategy='median') 
+    si_0 = SimpleImputer(missing_values=np.nan,strategy='median') 
     ss = StandardScaler() 
     ohe = OneHotEncoder(handle_unknown = 'ignore') #for extrimly unbalanced cases
     # define column groups with same processing
