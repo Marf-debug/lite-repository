@@ -575,8 +575,11 @@ def return_scores(model,  X_train, X_test, y_train, y_test):
     cv_roc_auc_mean = round(np.mean(cross_val_score(model, X_train, y_train , cv=10, scoring='roc_auc')),2)
     cv_mcc_mean = round(np.mean(cross_val_score(model, X_train, y_train ,cv=10,scoring=Matthew)),2)    
     cv_accuracy_mean = round(np.mean(cross_val_score(model, X_train, y_train , cv=10, scoring='accuracy')),2)
-    cv_f1_mean = round(np.mean(cross_val_score(model, X_train, y_train , cv=10, scoring='f1')),2)
-    cv_precision_mean = round(np.mean(cross_val_score(model, X_train, y_train , cv=10, scoring='precision')),2)
+    f1_scorer = make_scorer(f1_score, zero_division=0)
+    precision_scorer = make_scorer(precision_score, zero_division=0)
+    cv_f1_mean = round(np.mean(cross_val_score(model, X_train, y_train, cv=10, scoring=f1_scorer)), 2)
+    cv_precision_mean = round(np.mean(cross_val_score(model, X_train, y_train, cv=10, scoring=precision_scorer)), 2)
+
     #display(cv_precision_mean)
     cv_recall_mean = round(np.mean(cross_val_score(model, X_train, y_train , cv=10, scoring='recall')),2)
     #for blind test
