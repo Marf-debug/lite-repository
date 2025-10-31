@@ -584,9 +584,9 @@ def return_scores(model,  X_train, X_test, y_train, y_test):
     y_pred_best = model.predict(X_test)
     mcc = round(matthews_corrcoef(y_test, y_pred_best),2)
     accuracy = round(accuracy_score(y_test, y_pred_best),2)
-    f1 = round(f1_score(y_test, y_pred_best, average='binary'),2)
-    precision = round(precision_score(y_test, y_pred_best, average='binary'),2)
-    recall = round(recall_score(y_test, y_pred_best, average='binary'),2)
+    f1 = round(f1_score(y_test, y_pred_best, average='binary', zero_division=0),2)
+    precision = round(precision_score(y_test, y_pred_best, average='binary', zero_division=0),2)
+    recall = round(recall_score(y_test, y_pred_best, average='binary', zero_division=0),2)
     return cv_roc_auc_mean,cv_mcc_mean,cv_accuracy_mean,cv_f1_mean,cv_precision_mean,cv_recall_mean, roc_auc,mcc,accuracy,f1,precision,recall
 
 '''def create_table_with_metrics(metrics_values, name_of_dataframe):
@@ -727,7 +727,7 @@ def modelling_base_vs_best(model,  X_train, X_test, y_train, y_test):
         fig, ax = plt.subplots(1,4, figsize=(27,5))
         fig.suptitle('MODEL WITH ALL 74 AVAILABLE FEATURES ON BLIND DATASET             MODEL WITH BEST COMBINATION OF 10 FEATURES ON BLIND DATASET', y=1.09, x=0.55, fontsize=21,  fontweight='bold')
     #base model
-    RocCurveDisplay(model, X_test, y_test, ax=ax[0])
+    RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax[0])
     ax[0].plot([0,1], [0,1], linestyle='--', lw=2, label='Chance', alpha=.8)
     sns.heatmap(confusion_matrix(y_test, y_pred, labels=[1, 0]), annot=True, fmt='g', ax=ax[1], cmap='Blues',xticklabels=['admitted','non-admitted'],yticklabels=['admitted','non-admitted'])   
     ax[1].set_ylabel('Actual')
@@ -754,7 +754,7 @@ def modelling_base_vs_best(model,  X_train, X_test, y_train, y_test):
     create_table_with_metrics_n_column([[cv_roc_auc_mean,roc_auc,cv_roc_auc_mean_best,roc_auc_best],[cv_accuracy_mean,accuracy,cv_accuracy_mean_best,accuracy_best],[cv_precision_mean,precision,cv_precision_mean_best,precision_best], [cv_recall_mean,recall,cv_recall_mean_best,recall_best]],model.__class__.__name__,4)
     #[cv_mcc_mean,mcc,cv_mcc_mean_best,mcc_best],[cv_f1_mean,f1,cv_f1_mean_best,f1_best],
     #plotting AUC
-    RocCurveDisplay(model, X_test_best, y_test, ax=ax[2])
+    RocCurveDisplay.from_estimator(model, X_test_best, y_test, ax=ax[2])
     ax[2].plot([0,1], [0,1], linestyle='--', lw=2, label='Chance', alpha=.8)
     #Heatmap for CV
     sns.heatmap(confusion_matrix(y_test, y_pred_best, labels=[1, 0]), annot=True, fmt='g', ax=ax[3], cmap='Oranges',xticklabels=['admitted','non-admitted'],yticklabels=['admitted','non-admitted'])  
