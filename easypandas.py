@@ -7,6 +7,8 @@
 # Author: Alex Lee
 # Date: 16 January 2025
 import pandas as pd
+
+!wget -O d2k_utils_2025.py https://raw.githubusercontent.com/melbourne-cdth/mimic/refs/heads/main/d2k_utils_2025.py?token=GHSAT0AAAAAADOGCLRKCF5BFGOYYFALUCAS2IL2JMA
 from d2k_utils_2025 import *
 
 def clean_numeric_string(text):
