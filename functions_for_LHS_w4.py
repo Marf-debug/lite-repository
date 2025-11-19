@@ -388,7 +388,7 @@ def modelling(model,  X_train, X_test, y_train, y_test, eval_strat):
         else:'''
         fig, ax = plt.subplots(1,2, figsize=(15,5), gridspec_kw={'width_ratios': [1.5, 1]})
      
-        RocCurveDisplay(model, X_test, y_test, ax=ax[0])
+        RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax[0])
         ax[0].plot([0,1], [0,1], linestyle='--', lw=2, label='Chance', alpha=.8)
         
         sns.heatmap(confusion_matrix(y_test, y_pred, labels=[1, 0]), annot=True, fmt='g', ax=ax[1], cmap='Blues',xticklabels=['admitted','non-admitted'],yticklabels=['admitted','non-admitted'])
