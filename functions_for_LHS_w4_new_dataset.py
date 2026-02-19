@@ -55,11 +55,11 @@ def return_cohort(username,password,cohort_type=0):
         dataset=pd.read_sql_query('''SELECT * FROM biogrid_vaed.WHOLE_COHORT_WITHOUT_OUTLIERS;''', cnx)
         
     # Coerce commonly-used count fields to numeric when present (supports multiple cohort versions)
-for _col in ['visits_b2018', 'visits_b2025', 'admissions_2017', 'admissions_2024']:
-    if _col in dataset.columns:
-        dataset[_col] = pd.to_numeric(dataset[_col], errors='coerce').astype('float64')
+    for _col in ['visits_b2018', 'visits_b2025', 'admissions_2017', 'admissions_2024']:
+        if _col in dataset.columns:
+            dataset[_col] = pd.to_numeric(dataset[_col], errors='coerce').astype('float64')
     return dataset
-    
+
 # qgrid customisation 
 def dataframe_2_qgrid(df):
 
