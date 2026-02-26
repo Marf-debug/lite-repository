@@ -321,7 +321,7 @@ def cohort_2_transform_df(X_train, X_test, scaler = True):
     # getting names for transform data
     # categorical values
     pipe_cats_actual = col_transformer.named_transformers_['cats']
-    names_cats = pipe_cats_actual['ohe'].get_feature_names()
+    names_cats = pipe_cats_actual['ohe'].get_feature_names_out()
     #print('Number of categorical names: %d ' %  len(names_cats))
     # numerical values
     names = [name for name, value in num_vars.iteritems() if value]
