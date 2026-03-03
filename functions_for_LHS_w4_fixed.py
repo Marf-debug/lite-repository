@@ -54,7 +54,7 @@ def return_cohort(username,password,cohort_type=0):
     elif cohort_type==2:
         dataset=pd.read_sql_query('''SELECT * FROM biogrid_vaed.WHOLE_COHORT_WITHOUT_OUTLIERS;''', cnx)
         
-    dataset = dataset.astype({'visits_b2018': 'float64', 'admissions_2017': 'float64'})
+    dataset = dataset.astype({'visits_b2025': 'float64', 'admissions_2024': 'float64'})
     return dataset
     
 # qgrid customisation 
@@ -68,7 +68,7 @@ def dataframe_2_qgrid(df):
     column_definitions={ 'index': { 'maxWidth': 0, 'minWidth': 0, 'width': 0 }, 
                          'pkey':  { 'maxWidth': 0, 'minWidth': 0, 'width': 0 }, 
                          #'pkey':  { 'toolTip': "Patient's identifier"},
-                         'age':  { 'toolTip': "Age as of 01/01/2018, all petients age 85+ were joined into one category '86'"},
+                         'age':  { 'toolTip': "Age as of 01/01/2025, all petients age 85+ were joined into one category '86'"},
                          'sex':  { 'toolTip': "Column gender has 2 categories: M, F"},
                          'interpreter    ':  { 'toolTip': "Whether the patient requires an interpreter"},
                          'hypertension':  { 'toolTip': "Whether person has a history of treatment for hypertension"},
@@ -100,7 +100,7 @@ def dataframe_2_qgrid(df):
                          'dka_diagnosis': { 'toolTip': "Whether the person has diagnosis of diabetic ketoacidosis "},
                          'alcohol': { 'toolTip': "Whether the person drinks alcohol"},
                          'smoker': { 'toolTip': "Smoking status of the person. The column has 4 categories: CURRENT, NO, UNKNOWN, FORMER"},
-                         'firstdiagnosed': { 'toolTip': "Number of years since the person has been diagnosed with diabetes type 2 as of 01/01/2018"},
+                         'firstdiagnosed': { 'toolTip': "Number of years since the person has been diagnosed with diabetes type 2 as of 01/01/2025"},
                          'sodium': { 'toolTip': "The person's measured sodium level in blood (mmol/L)."},
                          'potassium': { 'toolTip': "The person's measured potassium level in blood (mmol/L)."},
                          'chloride': { 'toolTip': "The person's measured chloride level in blood (mmol/L)."},
@@ -134,14 +134,14 @@ def dataframe_2_qgrid(df):
                          'cabg': { 'toolTip': "Whether the person has had a coronary artery bypass graft"},
                          'cardiomyopathy': { 'toolTip': "Whether the person has had ischaemic cardiomyopathy/cardiac failure."},
                          'neuropathy_ep': { 'toolTip': "Whether the person has had autonomic neuropathy"},
-                         'num_of_surv_in_2017': { 'toolTip': "Number of appointments before 01/01/2018"},
+                         'visits_b2025': "Number of appointments before 01/01/2025",
                          'method_manage_dt2': { 'toolTip': "The method being used to manage the person's diabetes. The column has 7 categories: BOTH INSULIN AND TABS, INSULIN,  INSULIN AND NON-INSULIN, OTHER, TABLETS, NON-INSULIN, DIET ONLY"},
                          'ind_of_nephropathy': { 'toolTip': "Whether the person has nephropathy (based on: eGFR, UACR indicators)"},
                          'cardiovascular_disease': { 'toolTip': "Whether the person has cardiovascular disease (based on: MI, ischaemic cardiomyopathy/cardiac failure, CABG)"},
                          'cerebrovascular_disease': { 'toolTip': "Whether the person has cerebrovascular disease (based on: AIT, stroke indicators)"},
                          'lower_limb_problems':  { 'toolTip': "Whether the person has lower limb problems like Charcot foot, ulceration "},
-                         'number_of_admissions_in_2017': { 'toolTip': "Number of admissions to the hospital during 2017"},
-                         'outcome': { 'toolTip': "Whether the person was hospitalised after 01/01/2018"},
+                          'admissions_2024': "Number of admissions to the hospital during 2024",
+                         'outcome': { 'toolTip': "Whether the person was hospitalised after 01/01/2025"},
 
                                }
           
@@ -185,7 +185,7 @@ def find_outliers(df, col_name):
     
 #Dictionary for dataset desription
 col_name_2_discription = {'pkey': "Patient's identifier",
- 'age': "Age as of 01/01/2018, all petients age 85+ were joined into one category '86'",
+ 'age': "Age as of 01/01/2025, all petients age 85+ were joined into one category '86'",
  'sex': "Column gender has 2 categories: M, F",
  'interpreter': "Whether the patient requires an interpreter",
  'hypertension': "Whether person has a history of treatment for hypertension",
@@ -217,7 +217,7 @@ col_name_2_discription = {'pkey': "Patient's identifier",
  'dka_diagnosis': "Whether the person has diagnosis of diabetic ketoacidosis ",
  'alcohol': "Whether the person drinks alcohol",
  'smoker': "Smoking status of the person",
- 'years_diagnosed': "Number of years since the person has been diagnosed with diabetes type 2 as of 01/01/2018",
+ 'years_diagnosed': "Number of years since the person has been diagnosed with diabetes type 2 as of 01/01/2025",
  'sodium': "The person's measured sodium level in blood (mmol/L)",
  'potassium': "The person's measured potassium level in blood (mmol/L)",
  'chloride': "The person's measured chloride level in blood (mmol/L)",
@@ -251,14 +251,14 @@ col_name_2_discription = {'pkey': "Patient's identifier",
  'cabg': "Whether the person has had a coronary artery bypass graft",
  'cardiomyopathy': "Whether the person has had ischaemic cardiomyopathy/cardiac failure",
  'neuropathy_ep': "Whether the person has had autonomic neuropathy",
- 'visits_b2018': "Number of appointments before 01/01/2018",
+ 'visits_b2025': "Number of appointments before 01/01/2025",
  'method_manage_dt2': "The method is used to manage the person's diabetes",
  'ind_of_nephropathy': "Whether the person has nephropathy (based on: eGFR, UACR indicators)",
  'cardiovascular_disease': "Whether the person has cardiovascular disease (based on: MI, ischaemic cardiomyopathy/cardiac failure, CABG)",
  'cerebrovascular_disease': "Whether the person has cerebrovascular disease (based on: AIT, stroke indicators)",
  'lower_limb_problems': "Whether the person has lower limb problems like Charcot foot, ulceration ",
- 'admissions_2017': "Number of admissions to the hospital during 2017",
- 'outcome': "Whether the person was hospitalised after 01/01/2018 - Yes/No",
+ 'admissions_2024': "Number of admissions to the hospital during 2024",
+ 'outcome': "Whether the person was hospitalised after 01/01/2025 - Yes/No",
  'hospital': "Hospital where a patient was admitted: RMH, WH",
  'albumin': "The persons measured albumin level (g/L)"}
 
