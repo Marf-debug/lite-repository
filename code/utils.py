@@ -7,8 +7,8 @@ COLUMN_DEFINITIONS = {
     'patient_id': "Patient's identifier",
     'hospital': "Hospital where the patient was admitted: RMH, WH",
     # Demographics
-    'age': "Age as of 01/01/2025, all petients age 85+ were joined into one category '86'",
-    'sex': "Column gender has 2 categories: M, F",
+    'age': "Age as of 01/01/2025, all patients aged 86+ were grouped into one category '86'",
+    'sex': "Column sex has 2 categories: M, F",
     'height': "Patient's height (cm)",
     'weight': "Patient's weight at admission (kg)",
     'weight_over_100': "Whether the patient is over 100kg",
@@ -23,12 +23,12 @@ COLUMN_DEFINITIONS = {
     'diastolic_bp': "The person's diastolic blood pressure",
     'elevated_bp': "Indicates whether the person has elevated blood pressure ( > 190/95 mmHg)",
     # Diabetes history
-    'years_diagnosed': "Number of years since the person has been diagnosed with diabetes type 2 as of 01/01/2025",
+    'years_since_diagnosis': "Number of years since the person has been diagnosed with diabetes type 2 as of 01/01/2025",
     'gestational_diabetes': "Whether the person has previously been diagnosed with gestational diabetes",
     # Family history of diabetes
     'family_history': "Family history of diabetes",
-    'siblings': "Patient has siblings with diabeties",
-    'children': "Patient has children with diabeties",
+    'siblings': "Patient has siblings with diabetes",
+    'children': "Patient has children with diabetes",
     # Medical history
     'hypertension': "Whether the patient has a history of treatment for hypertension",
     'hyperlipidaemia': "Whether the patient has a history of treatment for hyperlipidaemia",
