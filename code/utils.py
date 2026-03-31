@@ -1,7 +1,28 @@
+import numpy as np
 import pandas as pd
 from operator import eq, ge, gt, ne, lt, le
 import matplotlib.pyplot as plt
 from matplotlib_venn import venn2
+from sklearn.model_selection import StratifiedKFold, cross_validate
+from sklearn.feature_selection import SequentialFeatureSelector
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import *
+from time import time
+# Pretty plots
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set_style('ticks')
+plt.rcParams['figure.figsize'] = (6, 4)
+plt.rcParams['axes.titlesize'] = 18
+plt.rcParams['axes.labelsize'] = 16
+plt.rcParams['xtick.labelsize'] = 14
+plt.rcParams['ytick.labelsize'] = 14
+plt.rcParams['legend.title_fontsize'] = 12
+plt.rcParams['legend.fontsize'] = 12
+
 
 COLUMN_DEFINITIONS = {
     'patient_id': "Patient's identifier",
@@ -92,6 +113,33 @@ COLUMN_DEFINITIONS = {
     'outcome_admission_in_2025': "Whether the patient was hospitalised after 01/01/2025 - Yes/No",
     }
 
+CLFS = {
+    "Support Vector Machines": SVC(probability=True, kernel='linear', random_state=42),
+    "Logistic Regression": LogisticRegression(solver='liblinear', max_iter=5000, random_state=42),
+    "k Nearest Neighbours": KNeighborsClassifier(),
+    "Decision Tree": DecisionTreeClassifier(max_depth=10, random_state=42),
+}
+
+CAT_FEATURES_ENCODED = {
+    'RMH': 'hospital RMH',
+    'WH': 'hospital WH',
+    'F': 'sex F',
+    'M': 'sex M',
+    'CURRENT': 'smoker CURRENT',
+    'FORMER': 'smoker FORMER',
+    'NO': 'smoker NO',
+    'UNKNOWN': 'smoker UNKNOWN',
+    'BOTH INSULIN AND TABS': 'method BOTH INSULIN AND TABS',
+    'DIET ONLY': 'method DIET ONLY',
+    'INSULIN': 'method INSULIN',
+    'INSULIN AND NON-INSULIN': 'method INSULIN AND NON-INSULIN',
+    'NON-INSULIN': 'method NON-INSULIN',
+    'OTHER': 'method OTHER',
+    'TABLETS': 'method TABLETS',
+    'UNKNOWN': 'method UNKNOWN'
+}
+
+
 def get_cols_for_display(df):
     dtype_display_names = {
         'category': 'Categorical',
@@ -143,6 +191,15 @@ def make_venn_diagram(subs1, subs2, inter, label1, label2, colors):
     )
     plt.show()
 
+def calculate_missing_values(df, report_zeros=False):
+    # Calculate the number of missing values in each column and sort in descending order
+    missing_values = df.isna().sum().sort_values(ascending=False)
+    if not report_zeros:
+        missing_values = missing_values[missing_values > 0]
+    missing_values = missing_values.to_frame(name='Number of missing values')
+    missing_values['Proportion of missing values'] = (missing_values['Number of missing values'] / len(df) * 100).round(2)
+    return missing_values
+
 def find_outliers(x):   
     percentile25 = x.quantile(0.25)
     percentile75 = x.quantile(0.75)
@@ -152,3 +209,136 @@ def find_outliers(x):
     lower_limit = percentile25 - 1.5 * iqr
 
     return x[(x <= lower_limit) | (x >= upper_limit)]
+
+def get_categorical_features_encoded(preprocessor):
+    fts = list(np.hstack(preprocessor.transformers_[0][1][1].categories_))
+    return [CAT_FEATURES_ENCODED[ft] for ft in fts]
+
+def name2model(model_name):
+    return CLFS[model_name]
+
+def checkbox2feature(checkboxes):
+    features_list=[]
+    for num_group in range(len(checkboxes)):
+        for num_subgroup in range(len(checkboxes[num_group].children)):
+            if checkboxes[num_group].children[num_subgroup].value:
+                features_list.append(checkboxes[num_group].children[num_subgroup].description)
+    return features_list
+
+def score_cv(model, X, y):
+    """Train and evaluate a model using cross-validation."""
+    # Define scoring functions
+    scoring = {
+        'ROC AUC': 'roc_auc',
+        'PR AUC': 'average_precision', 
+        }
+
+    # Define CV strategy
+    cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+
+    print("_" * 80)
+    print("Training with %d-fold cross-validation:" % cv.n_splits)
+    
+    # Start timer
+    start_time = time()
+    
+    scores = cross_validate(estimator=model, X=X, y=y, scoring=scoring, cv=cv, n_jobs=-1, return_train_score=False)
+    
+    train_time = time() - start_time
+    
+    # Print model name
+    print(model)
+        
+    # Print training time    
+    print("train time: %0.3fs" % train_time)
+
+    # Print performance metrics
+    for k,v in scores.items():
+        if 'time' not in k:
+            dataset, metric = k.split('_')
+            print(f"Cross-validation {metric}: {v.mean():.3f} (+/- {v.std():.2f})")
+
+def evaluate(model, X_dev, y_dev, X_holdout, y_holdout, threshold=0.5):
+    model.fit(X_dev, y_dev)
+    y_proba = model.predict_proba(X_holdout)[:, 1]
+
+    # ROC and Precision-Recall curves in one figure
+    auc_roc = roc_auc_score(y_holdout, y_proba)
+    fpr, tpr, _ = roc_curve(y_holdout, y_proba)
+
+    auc_pr = average_precision_score(y_holdout, y_proba)
+    precision, recall, _ = precision_recall_curve(y_holdout, y_proba)
+
+    _, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+    # ROC subplot
+    axes[0].plot(fpr, tpr, color='orangered', linewidth=2, label=f'ROC AUC = {auc_roc:.3f}')
+    axes[0].plot([0, 1], [0, 1], color='slategray', linestyle='--')
+    axes[0].set_xlabel('False Positive Rate')
+    axes[0].set_ylabel('True Positive Rate')
+    axes[0].set_title('ROC Curve')
+    axes[0].legend()
+
+    # Precision-Recall subplot
+    axes[1].plot(recall, precision, color='forestgreen', linewidth=2, label=f'PR AUC = {auc_pr:.3f}')
+    axes[1].set_xlabel('Recall')
+    axes[1].set_ylabel('Precision')
+    axes[1].set_title('Precision-Recall Curve')
+    axes[1].legend()
+
+    plt.tight_layout()
+    plt.show();
+
+    y_pred = np.where(y_proba >= threshold, 1, 0)
+
+    plt.figure(figsize=(10, 4))
+    cmap = sns.light_palette('steelblue', as_cmap=True)
+    class_names = ['Not admitted', 'Admitted']
+    sns.heatmap(confusion_matrix(y_holdout, y_pred), 
+                annot=True, fmt='d', annot_kws={'size': 16},
+                cmap=cmap, cbar=False, 
+                xticklabels=class_names, 
+                yticklabels=class_names
+                );
+
+    plt.yticks(rotation=0)
+    plt.xlabel("Predicted")
+    plt.ylabel("True")
+    plt.title("Confusion matrix");
+
+    # print("Precision (positive predictive value): {:.0f}%".format(precision_score(y_holdout, y_pred)*100))
+    # print("Recall (sensitivity): {:.0f}%".format(recall_score(y_holdout, y_pred)*100))
+
+def select_features_cv(model, X, y, n_splits=10, tol=0.01, direction='forward'):
+    # Define scoring functions
+    scoring = 'roc_auc'
+
+    # Define CV strategy
+    cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
+
+    print("_" * 80)
+    print("Training with %d-fold cross-validation:" % cv.n_splits)
+
+    # Start timer
+    start_time = time()
+
+    sfs = SequentialFeatureSelector(
+        estimator=model,
+        # n_features_to_select=10,
+        tol=tol,
+        direction=direction,
+        scoring=scoring,
+        cv=cv,
+        n_jobs=-1
+    )
+    sfs.fit(X, y)
+
+    train_time = time() - start_time
+
+    # Print training time    
+    print("train time: %0.3fs" % train_time)
+
+    # Print number of selected features
+    print(f"Number of selected features: {sfs.get_support().sum()}")
+
+    return sfs
