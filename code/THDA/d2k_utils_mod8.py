@@ -247,8 +247,8 @@ def create_crosstab(var, target='fail_ext_status_bin'):
         ]},
         # Highlight the totals row with a light gray background
         {'selector': 'tr:last-child', 'props': [
-            ('background-color', 'Canvas'),
-            ('color', 'CanvasText')
+            ('background-color', '#555'),
+            ('color', 'white')
         ]}
     ])
     
