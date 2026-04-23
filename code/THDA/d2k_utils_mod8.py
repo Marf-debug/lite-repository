@@ -232,9 +232,7 @@ def create_crosstab(var, target='fail_ext_status_bin'):
             ('text-align', 'center'),
             ('padding', '8px'),
             ('white-space', 'normal'),
-            ('max-width', '100px'),
-            ('background-color', 'Canvas'),
-            ('color', 'CanvasText')
+            ('max-width', '100px')
         ]},
         {'selector': 'td', 'props': [
             ('text-align', 'center'),
@@ -249,8 +247,7 @@ def create_crosstab(var, target='fail_ext_status_bin'):
         ]},
         # Highlight the totals row with a light gray background
         {'selector': 'tr:last-child', 'props': [
-            ('background-color', 'Canvas'),
-            ('color', 'CanvasText')
+            ('background-color', '#f0f0f0')
         ]}
     ])
     
